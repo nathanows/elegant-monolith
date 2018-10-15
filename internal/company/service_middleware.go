@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/go-kit/kit/log"
-	pb "github.com/nathanows/elegant-monolith/_protos"
+	pb "github.com/nathanows/elegant-monolith/_protos/companyusers"
 )
 
 // ServiceMiddleware describes a service middleware

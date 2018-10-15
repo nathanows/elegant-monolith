@@ -6,7 +6,7 @@ import (
 	"github.com/go-kit/kit/endpoint"
 	"github.com/go-kit/kit/log"
 	"github.com/gogo/protobuf/types"
-	pb "github.com/nathanows/elegant-monolith/_protos"
+	pb "github.com/nathanows/elegant-monolith/_protos/companyusers"
 )
 
 // Set collects all of the endpoints that compose a user service. It's meant to

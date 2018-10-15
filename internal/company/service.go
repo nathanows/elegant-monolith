@@ -8,7 +8,7 @@ import (
 	"github.com/asaskevich/govalidator"
 	"github.com/go-kit/kit/log"
 	"github.com/gogo/protobuf/types"
-	pb "github.com/nathanows/elegant-monolith/_protos"
+	pb "github.com/nathanows/elegant-monolith/_protos/companyusers"
 )
 
 // Service interface defines the core Company service functionality

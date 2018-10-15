@@ -11,4 +11,4 @@ Mgoogle/protobuf/struct.proto=github.com/gogo/protobuf/types,\
 Mgoogle/protobuf/timestamp.proto=github.com/gogo/protobuf/types,\
 Mgoogle/protobuf/wrappers.proto=github.com/gogo/protobuf/types,\
 plugins=grpc:\
-$GOPATH/src/github.com/nathanows/elegant-monolith/_protos $GOPATH/src/github.com/nathanows/elegant-monolith/_protos/companyusers.proto
+$GOPATH/src/github.com/nathanows/elegant-monolith/_protos $GOPATH/src/github.com/nathanows/elegant-monolith/_protos/companyusers/companyusers.proto

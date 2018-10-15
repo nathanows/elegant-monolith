@@ -8,7 +8,7 @@ import (
 	types "github.com/gogo/protobuf/types"
 	oldcontext "golang.org/x/net/context"
 
-	pb "github.com/nathanows/elegant-monolith/_protos"
+	pb "github.com/nathanows/elegant-monolith/_protos/companyusers"
 )
 
 type grpcServer struct {

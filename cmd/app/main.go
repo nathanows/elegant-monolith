@@ -15,7 +15,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
-	pb "github.com/nathanows/elegant-monolith/_protos"
+	pb "github.com/nathanows/elegant-monolith/_protos/companyusers"
 	"github.com/nathanows/elegant-monolith/internal/company"
 	"github.com/nathanows/elegant-monolith/pkg/conf"
 )
