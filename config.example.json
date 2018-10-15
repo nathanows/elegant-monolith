@@ -1,0 +1,11 @@
+{
+  "port": 8080,
+  "databaseConfig": {
+    "username": "username",
+    "password": "secretpassword",
+    "hostname": "localhost",
+    "database": "elegant_monolith",
+    "port": 5432,
+    "sslmode": "disable"
+  }
+}

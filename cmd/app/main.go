@@ -17,6 +17,7 @@ import (
 
 	pb "github.com/nathanows/elegant-monolith/_protos"
 	"github.com/nathanows/elegant-monolith/internal/company"
+	"github.com/nathanows/elegant-monolith/pkg/conf"
 )
 
 var rootCmd = &cobra.Command{
@@ -41,13 +42,26 @@ func run(cmd *cobra.Command, args []string) {
 		logger = log.With(logger, "caller", log.DefaultCaller)
 	}
 
+	var config *Config
+	{
+		config = &Config{}
+		parser, err := conf.NewParser(cmd, config, conf.EnvPrefix("EM"))
+		if err != nil {
+			logger.Log("config", "parser_init_err", "during", "NewParser", "err", err)
+			os.Exit(1)
+		}
+		if err := parser.LoadConfig(); err != nil {
+			logger.Log("config", "load_err", "during", "LoadConfig", "err", err)
+			os.Exit(1)
+		}
+	}
+
 	var db *sqlx.DB
 	{
 		var err error
-		connStr := fmt.Sprintf("user=%s dbname=%s sslmode=disable ", "USER", "DBNAME")
-		db, err = sqlx.Connect("postgres", connStr)
+		db, err = sqlx.Connect("postgres", config.DatabaseConfig.BuildDbConnectionStr())
 		if err != nil {
-			logger.Log("database", "elegant_monolith", "during", "connect", "err", err)
+			logger.Log("database", config.DatabaseConfig.Database, "during", "connect", "err", err)
 			os.Exit(1)
 		}
 		defer db.Close()
@@ -62,13 +76,14 @@ func run(cmd *cobra.Command, args []string) {
 
 	var g group.Group
 	{
-		grpcListener, err := net.Listen("tcp", ":8080")
+		port := fmt.Sprintf(":%d", config.Port)
+		grpcListener, err := net.Listen("tcp", port)
 		if err != nil {
 			logger.Log("transport", "gRPC", "during", "Listen", "err", err)
 			os.Exit(1)
 		}
 		g.Add(func() error {
-			logger.Log("transport", "gRPC", "addr", ":8080")
+			logger.Log("transport", "gRPC", "port", port)
 			baseServer := grpc.NewServer()
 			pb.RegisterCompanySvcServer(baseServer, grpcServer)
 			reflection.Register(baseServer)
