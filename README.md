@@ -1,0 +1,10 @@
+# Elegant Monolith
+
+This project is a sample application made using the [Go-Kit](https://github.com/go-kit/kit) library and patterns. 
+
+Many of the current examples out there are (understandably) simplistic in terms of business logic and include all possible Go-Kit options. This sample aims to be a little more selective and opinionated while producing a service that could theoretically be used in a production environment.
+
+## Design Choices
+- **Elegant Monolith**: This app is designed as an _elegant monolith_, or a collection of related services packaged as a single deployable unit. The _elegance_ comes from the lack of service coupling and strong service contracts allowing functionality to be broken out as needed based on scaling, organizational needs, etc. with minimal effort.
+- **Protobuf**: Protocol buffers are used as a common data structure definition throughout the application, not just in Go-Kit's transport layer as is done in most Go-Kit examples. This reduces (but doesn't eliminate) the need to continuously map between data transfer objects at each layer of the application. A common data structure definition also allows us to have a common domain definition when talking about what an entity is across the organization (a User, is a User, is a User).
+- **HTTP/gRPC**: HTTP and gRPC will be simultaneously supported. gRPC [has](https://grpc.io/blog/vendastagrpc) [plenty](https://www.sajari.com/blog/grpc-and-displacement-of-rest-apis) of [benefits](https://grpc.io/2018/01/22/grpc-go-engineering-practices.html) over a standard RESTful API, but also introduces some additional challenges in certain areas (edge communication (browser/mobile), developer workflows, etc.) and is an additional hurdle for teams who have traditionally worked exclusively in REST and JSON. By using Protocol Buffer defined messages throughout the app, including a gRPC transport layer is very little effort and allows teams to transition to the protocol when they're comfortable and when the benefits become clear.

@@ -1,0 +1,137 @@
+syntax = "proto3";
+package companyusers;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+
+option go_package = "companyuserspb";
+
+service UserSvc {
+  rpc Save(SaveUserRequest) returns (User) {}
+  rpc Find(FindUserRequest) returns (User) {}
+  rpc FindAll(FindAllUsersRequest) returns (FindAllUsersResponse) {}
+  rpc Delete(DeleteUserRequest) returns (google.protobuf.Empty) {}
+}
+
+service CompanySvc {
+  rpc Save(SaveCompanyRequest) returns (Company) {}
+  rpc Find(FindCompanyRequest) returns (Company) {}
+  rpc FindAll(FindAllCompaniesRequest) returns (FindAllCompaniesResponse) {}
+  rpc Delete(DeleteCompanyRequest) returns (google.protobuf.Empty) {}
+}
+
+service CompanyUserSvc {
+  rpc Save(SaveCompanyUserRequest) returns (CompanyUser) {}
+  rpc Find(FindCompanyUserRequest) returns (CompanyUser) {}
+  rpc FindAllCompanyUsers(FindAllCompanyUsersRequest) returns (FindAllCompanyUsersResponse) {}
+  rpc FindAllUsersCompanies(FindAllUsersCompaniesRequest) returns (FindAllUsersCompaniesResponse) {}
+  rpc Delete(DeleteCompanyUserRequest) returns (google.protobuf.Empty) {}
+}
+
+message User {
+  int64 id = 1 [(gogoproto.customname) = "ID"];
+  string first_name = 2;
+  string last_name = 3;
+  string email = 4;
+
+  google.protobuf.Timestamp created_at = 50;
+  google.protobuf.Timestamp updated_at = 51;
+}
+
+message Company {
+  int64 id = 1 [(gogoproto.customname) = "ID"];
+  string name = 2;
+
+  google.protobuf.Timestamp created_at = 50;
+  google.protobuf.Timestamp updated_at = 51;
+}
+
+message CompanyUser {
+  int64 company_id = 1 [(gogoproto.customname) = "CompanyID"];
+  int64 user_id = 2 [(gogoproto.customname) = "UserID"];
+
+  google.protobuf.Timestamp created_at = 50;
+  google.protobuf.Timestamp updated_at = 51;
+}
+
+message Pagination {
+  int32 page_number = 1;
+  int32 results_per_page = 2;
+}
+
+message SaveUserRequest {
+  User user = 1;
+}
+
+message FindUserRequest {
+  int64 id = 1 [(gogoproto.customname) = "ID"];
+}
+
+message FindAllUsersRequest {
+  Pagination pagination = 50;
+}
+
+message FindAllUsersResponse {
+  repeated User users = 1;
+
+  Pagination pagination = 50;
+}
+
+message DeleteUserRequest {
+  int64 id = 1 [(gogoproto.customname) = "ID"];
+}
+
+message SaveCompanyRequest {
+  Company company = 1;
+}
+
+message FindCompanyRequest {
+  int64 id = 1 [(gogoproto.customname) = "ID"];
+}
+
+message FindAllCompaniesRequest {
+  Pagination pagination = 50;
+}
+
+message FindAllCompaniesResponse {
+  repeated Company companies = 1;
+
+  Pagination pagination = 50;
+}
+
+message DeleteCompanyRequest {
+  int64 id = 1 [(gogoproto.customname) = "ID"];
+}
+
+message SaveCompanyUserRequest {
+  CompanyUser company_user = 1;
+}
+
+message FindCompanyUserRequest {
+  int64 id = 1 [(gogoproto.customname) = "ID"];
+}
+
+message FindAllCompanyUsersRequest {
+  Pagination pagination = 50;
+}
+
+message FindAllCompanyUsersResponse {
+  repeated CompanyUser company_users = 1; 
+
+  Pagination pagination = 50;
+}
+
+message FindAllUsersCompaniesRequest {
+  int64 user_id = 1 [(gogoproto.customname) = "UserID"];
+}
+
+message FindAllUsersCompaniesResponse {
+  repeated int64 company_ids = 1 [(gogoproto.customname) = "CompanyIDs"];
+
+  Pagination pagination = 50;
+}
+
+message DeleteCompanyUserRequest {
+  int64 id = 1 [(gogoproto.customname) = "ID"];
+}
