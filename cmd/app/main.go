@@ -16,7 +16,6 @@ import (
 	"google.golang.org/grpc/reflection"
 
 	pb "github.com/nathanows/elegant-monolith/_protos/companyusers"
-	companyendpoints "github.com/nathanows/elegant-monolith/internal/company/endpoints"
 	companyservice "github.com/nathanows/elegant-monolith/internal/company/service"
 	companytransport "github.com/nathanows/elegant-monolith/internal/company/transport"
 	"github.com/nathanows/elegant-monolith/pkg/conf"
@@ -72,7 +71,7 @@ func run(cmd *cobra.Command, args []string) {
 	var (
 		repository = companyservice.NewRepository(db)
 		service    = companyservice.NewService(logger, repository)
-		endpoints  = companyendpoints.NewEndpointSet(service, logger)
+		endpoints  = companytransport.NewEndpointSet(service, logger)
 		grpcServer = companytransport.NewGRPCServer(endpoints, logger)
 	)
 

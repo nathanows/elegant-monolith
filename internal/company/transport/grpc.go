@@ -13,7 +13,6 @@ import (
 
 	pb "github.com/nathanows/elegant-monolith/_protos/companyusers"
 	"github.com/nathanows/elegant-monolith/internal/company"
-	"github.com/nathanows/elegant-monolith/internal/company/endpoints"
 )
 
 type grpcServer struct {
@@ -24,7 +23,7 @@ type grpcServer struct {
 }
 
 // NewGRPCServer makes a set of endpoints available as a gRPC AddServer.
-func NewGRPCServer(endpoints endpoints.Set, logger log.Logger) pb.CompanySvcServer {
+func NewGRPCServer(endpoints Set, logger log.Logger) pb.CompanySvcServer {
 	options := []grpctransport.ServerOption{
 		grpctransport.ServerErrorLogger(logger),
 	}

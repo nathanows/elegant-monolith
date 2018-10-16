@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -41,19 +40,16 @@ func (r repository) save(company *companyDTO) (*companyDTO, error) {
 		} else {
 			var companyExists bool
 			if err := r.db.Get(&companyExists, sqlCompanyExists, company.ID); err != nil {
-				fmt.Println(err)
 				return nil, ErrRepository
 			}
 
 			if !companyExists {
-				fmt.Println(err)
 				return nil, ErrNotFound
 			}
 
 			stmt, err = r.db.PrepareNamed(sqlUpdateCompany)
 		}
 		if err != nil {
-			fmt.Println(err)
 			return nil, ErrRepository
 		}
 	}
