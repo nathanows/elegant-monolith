@@ -73,7 +73,9 @@ func encodeError(err error) error {
 	switch err {
 	case company.ErrRepository:
 		return status.Error(codes.Internal, err.Error())
-	case company.ErrRequireName, company.ErrInvalidName, company.ErrCompanyNotFound:
+	case company.ErrRequireName, company.ErrInvalidName:
+		return status.Error(codes.InvalidArgument, err.Error())
+	case company.ErrUniqueName, company.ErrCompanyNotFound:
 		return status.Error(codes.FailedPrecondition, err.Error())
 	default:
 		return status.Error(codes.Internal, err.Error())

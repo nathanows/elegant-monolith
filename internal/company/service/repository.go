@@ -4,12 +4,14 @@ import (
 	"errors"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 )
 
 // Common errors
 var (
 	ErrRepository = errors.New("unable to handle request")
 	ErrNotFound   = errors.New("company not found")
+	ErrUniqueness = errors.New("uniqueness constraint violation")
 )
 
 // Repository is the datastore inteface for the company service
@@ -56,6 +58,11 @@ func (r repository) save(company *companyDTO) (*companyDTO, error) {
 
 	var saved companyDTO
 	if err := stmt.QueryRowx(company).StructScan(&saved); err != nil {
+		if pgerr, ok := err.(*pq.Error); ok {
+			if pgerr.Code == "23505" {
+				return nil, ErrUniqueness
+			}
+		}
 		return nil, ErrRepository
 	}
 

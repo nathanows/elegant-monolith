@@ -65,6 +65,8 @@ func (s basicService) Save(ctx context.Context, companyToSave *pb.Company) (*pb.
 			return nil, company.ErrRepository
 		case err == ErrNotFound:
 			return nil, company.ErrCompanyNotFound
+		case err == ErrUniqueness:
+			return nil, company.ErrUniqueName
 		default:
 			// TODO: need a way to monitor for unhandled errors
 			return nil, err
