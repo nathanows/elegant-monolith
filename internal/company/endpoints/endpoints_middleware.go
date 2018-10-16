@@ -1,4 +1,4 @@
-package company
+package endpoints
 
 import (
 	"context"
@@ -8,9 +8,9 @@ import (
 	"github.com/go-kit/kit/log"
 )
 
-// EndpointsLoggingMiddleware returns an endpoint middleware that logs the
+// LoggingMiddleware returns an endpoint middleware that logs the
 // duration of each invocation, and the resulting error, if any.
-func EndpointsLoggingMiddleware(logger log.Logger) endpoint.Middleware {
+func LoggingMiddleware(logger log.Logger) endpoint.Middleware {
 	return func(next endpoint.Endpoint) endpoint.Endpoint {
 		return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 			defer func(begin time.Time) {

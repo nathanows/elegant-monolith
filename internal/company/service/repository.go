@@ -1,15 +1,16 @@
-package company
+package service
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/jmoiron/sqlx"
 )
 
 // Common errors
 var (
-	ErrRepo     = errors.New("unable to handle request")
-	ErrNotFound = errors.New("company not found")
+	ErrRepository = errors.New("unable to handle request")
+	ErrNotFound   = errors.New("company not found")
 )
 
 // Repository is the datastore inteface for the company service
@@ -40,23 +41,26 @@ func (r repository) save(company *companyDTO) (*companyDTO, error) {
 		} else {
 			var companyExists bool
 			if err := r.db.Get(&companyExists, sqlCompanyExists, company.ID); err != nil {
-				return nil, ErrRepo
+				fmt.Println(err)
+				return nil, ErrRepository
 			}
 
 			if !companyExists {
+				fmt.Println(err)
 				return nil, ErrNotFound
 			}
 
 			stmt, err = r.db.PrepareNamed(sqlUpdateCompany)
 		}
 		if err != nil {
-			return nil, ErrRepo
+			fmt.Println(err)
+			return nil, ErrRepository
 		}
 	}
 
 	var saved companyDTO
 	if err := stmt.QueryRowx(company).StructScan(&saved); err != nil {
-		return nil, ErrRepo
+		return nil, ErrRepository
 	}
 
 	return &saved, nil
@@ -74,7 +78,7 @@ func (r repository) findAll() ([]*companyDTO, error) {
 	return []*companyDTO{}, nil
 }
 
-const sqlCompanyExists = "select exists(select 1 from companies where id=?)"
+const sqlCompanyExists = "select exists(select 1 from companies where id = $1)"
 
 const sqlInsertCompany = `
 	INSERT INTO companies (name)

@@ -1,4 +1,4 @@
-package company
+package transport
 
 import (
 	"context"
@@ -12,6 +12,8 @@ import (
 	"google.golang.org/grpc/status"
 
 	pb "github.com/nathanows/elegant-monolith/_protos/companyusers"
+	"github.com/nathanows/elegant-monolith/internal/company"
+	"github.com/nathanows/elegant-monolith/internal/company/endpoints"
 )
 
 type grpcServer struct {
@@ -22,7 +24,7 @@ type grpcServer struct {
 }
 
 // NewGRPCServer makes a set of endpoints available as a gRPC AddServer.
-func NewGRPCServer(endpoints Set, logger log.Logger) pb.CompanySvcServer {
+func NewGRPCServer(endpoints endpoints.Set, logger log.Logger) pb.CompanySvcServer {
 	options := []grpctransport.ServerOption{
 		grpctransport.ServerErrorLogger(logger),
 	}
@@ -70,9 +72,9 @@ func (s *grpcServer) FindAll(ctx oldcontext.Context, req *pb.FindAllCompaniesReq
 
 func encodeError(err error) error {
 	switch err {
-	case ErrRepository:
+	case company.ErrRepository:
 		return status.Error(codes.Internal, err.Error())
-	case ErrRequireName, ErrInvalidName, ErrCompanyNotFound:
+	case company.ErrRequireName, company.ErrInvalidName, company.ErrCompanyNotFound:
 		return status.Error(codes.FailedPrecondition, err.Error())
 	default:
 		return status.Error(codes.Internal, err.Error())

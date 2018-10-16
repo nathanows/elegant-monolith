@@ -1,4 +1,4 @@
-package company
+package service
 
 import (
 	"context"
@@ -8,7 +8,9 @@ import (
 	"github.com/asaskevich/govalidator"
 	"github.com/go-kit/kit/log"
 	"github.com/gogo/protobuf/types"
+
 	pb "github.com/nathanows/elegant-monolith/_protos/companyusers"
+	"github.com/nathanows/elegant-monolith/internal/company"
 )
 
 // Service interface defines the core Company service functionality
@@ -48,9 +50,9 @@ func (s basicService) Save(ctx context.Context, companyToSave *pb.Company) (*pb.
 		firstErr := errs.Errors()[0].(govalidator.Error)
 		if firstErr.Name == "Name" {
 			if firstErr.Validator == "required" {
-				return nil, ErrRequireName
+				return nil, company.ErrRequireName
 			}
-			return nil, ErrInvalidName
+			return nil, company.ErrInvalidName
 		}
 		// TODO: need a way to monitor for unhandled errors
 		return nil, err
@@ -59,10 +61,10 @@ func (s basicService) Save(ctx context.Context, companyToSave *pb.Company) (*pb.
 	saved, err := s.repository.save(companyDTO)
 	if err != nil {
 		switch {
-		case err == ErrRepo:
-			return nil, ErrRepository
+		case err == ErrRepository:
+			return nil, company.ErrRepository
 		case err == ErrNotFound:
-			return nil, ErrCompanyNotFound
+			return nil, company.ErrCompanyNotFound
 		default:
 			// TODO: need a way to monitor for unhandled errors
 			return nil, err

@@ -1,4 +1,4 @@
-package company
+package service
 
 import (
 	"context"
