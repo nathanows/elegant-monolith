@@ -80,7 +80,6 @@ func encodeError(err error) error {
 	default:
 		return status.Error(codes.Internal, err.Error())
 	}
-
 }
 
 func newGPRCServer(endpoint endpoint.Endpoint, options ...grpctransport.ServerOption) *grpctransport.Server {

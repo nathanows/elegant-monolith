@@ -71,17 +71,13 @@ func run(cmd *cobra.Command, args []string) {
 	}
 
 	var (
-		repository = companyservice.NewRepository(db)
-		service    = companyservice.NewService(logger, repository)
-		endpoints  = companytransport.NewEndpointSet(service, logger)
-		grpcServer = companytransport.NewGRPCServer(endpoints, logger)
-		httpServer = companytransport.NewHTTPServer(endpoints, logger)
+		companyHTTPServer, companyGRPCServer = buildCompanyServers(logger, db)
 	)
 
 	var httpAPI http.Handler
 	{
 		r := mux.NewRouter()
-		r.PathPrefix("/company/").Handler(http.StripPrefix("/company", httpServer))
+		r.PathPrefix("/company/").Handler(http.StripPrefix("/company", companyHTTPServer))
 		httpAPI = r
 	}
 
@@ -110,7 +106,7 @@ func run(cmd *cobra.Command, args []string) {
 		g.Add(func() error {
 			logger.Log("transport", "gRPC", "addr", port)
 			baseServer := grpc.NewServer()
-			pb.RegisterCompanySvcServer(baseServer, grpcServer)
+			pb.RegisterCompanySvcServer(baseServer, companyGRPCServer)
 			reflection.Register(baseServer)
 			return baseServer.Serve(grpcListener)
 		}, func(error) {
@@ -134,4 +130,14 @@ func run(cmd *cobra.Command, args []string) {
 	}
 
 	logger.Log("exit", g.Run())
+}
+
+func buildCompanyServers(logger log.Logger, db *sqlx.DB) (http.Handler, pb.CompanySvcServer) {
+	repository := companyservice.NewRepository(db)
+	service := companyservice.NewService(logger, repository)
+	endpoints := companytransport.NewEndpointSet(service, logger)
+	grpcServer := companytransport.NewGRPCServer(endpoints, logger)
+	httpServer := companytransport.NewHTTPServer(endpoints, logger)
+
+	return httpServer, grpcServer
 }

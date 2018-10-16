@@ -13,7 +13,6 @@ import (
 )
 
 // NewHTTPServer mounts all of the service endpoints into an http.Handler.
-// Useful in a profilesvc server.
 func NewHTTPServer(endpoints Set, logger log.Logger) http.Handler {
 	r := mux.NewRouter()
 	options := []httptransport.ServerOption{
