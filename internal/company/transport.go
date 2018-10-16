@@ -3,6 +3,7 @@ package company
 import (
 	"context"
 
+	"github.com/go-kit/kit/endpoint"
 	"github.com/go-kit/kit/log"
 	grpctransport "github.com/go-kit/kit/transport/grpc"
 	types "github.com/gogo/protobuf/types"
@@ -25,30 +26,10 @@ func NewGRPCServer(endpoints Set, logger log.Logger) pb.CompanySvcServer {
 	}
 
 	return &grpcServer{
-		save: grpctransport.NewServer(
-			endpoints.SaveEndpoint,
-			decodeGRPCRequest,
-			encodeGRPCResponse,
-			options...,
-		),
-		find: grpctransport.NewServer(
-			endpoints.FindEndpoint,
-			decodeGRPCRequest,
-			encodeGRPCResponse,
-			options...,
-		),
-		delete: grpctransport.NewServer(
-			endpoints.DeleteEndpoint,
-			decodeGRPCRequest,
-			encodeGRPCResponse,
-			options...,
-		),
-		findAll: grpctransport.NewServer(
-			endpoints.FindAllEndpoint,
-			decodeGRPCRequest,
-			encodeGRPCResponse,
-			options...,
-		),
+		save:    newGPRCServer(endpoints.SaveEndpoint, options...),
+		find:    newGPRCServer(endpoints.FindEndpoint, options...),
+		delete:  newGPRCServer(endpoints.DeleteEndpoint, options...),
+		findAll: newGPRCServer(endpoints.FindAllEndpoint, options...),
 	}
 }
 
@@ -82,6 +63,15 @@ func (s *grpcServer) FindAll(ctx oldcontext.Context, req *pb.FindAllCompaniesReq
 		return nil, err
 	}
 	return rep.(*pb.FindAllCompaniesResponse), nil
+}
+
+func newGPRCServer(endpoint endpoint.Endpoint, options ...grpctransport.ServerOption) *grpctransport.Server {
+	return grpctransport.NewServer(
+		endpoint,
+		decodeGRPCRequest,
+		encodeGRPCResponse,
+		options...,
+	)
 }
 
 func decodeGRPCRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
