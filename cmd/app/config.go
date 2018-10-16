@@ -9,7 +9,8 @@ import (
 // The Config struct wraps the available application level config. Viper is used
 // to marshal config files/env vars/flags to Config
 type Config struct {
-	Port           int
+	GRPCAddr       int
+	HTTPAddr       int
 	DatabaseConfig DatabaseConfig
 }
 

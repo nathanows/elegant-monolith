@@ -3,11 +3,13 @@ package app
 import (
 	"fmt"
 	"net"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/go-kit/kit/log"
+	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" // Postgres driver
 	"github.com/oklog/oklog/pkg/group"
@@ -73,18 +75,40 @@ func run(cmd *cobra.Command, args []string) {
 		service    = companyservice.NewService(logger, repository)
 		endpoints  = companytransport.NewEndpointSet(service, logger)
 		grpcServer = companytransport.NewGRPCServer(endpoints, logger)
+		httpServer = companytransport.NewHTTPServer(endpoints, logger)
 	)
+
+	var httpAPI http.Handler
+	{
+		r := mux.NewRouter()
+		r.PathPrefix("/company/").Handler(http.StripPrefix("/company", httpServer))
+		httpAPI = r
+	}
 
 	var g group.Group
 	{
-		port := fmt.Sprintf(":%d", config.Port)
+		port := fmt.Sprintf(":%d", config.HTTPAddr)
+		httpListener, err := net.Listen("tcp", port)
+		if err != nil {
+			logger.Log("transport", "HTTP", "during", "Listen", "err", err)
+			os.Exit(1)
+		}
+		g.Add(func() error {
+			logger.Log("transport", "HTTP", "addr", port)
+			return http.Serve(httpListener, httpAPI)
+		}, func(error) {
+			httpListener.Close()
+		})
+	}
+	{
+		port := fmt.Sprintf(":%d", config.GRPCAddr)
 		grpcListener, err := net.Listen("tcp", port)
 		if err != nil {
 			logger.Log("transport", "gRPC", "during", "Listen", "err", err)
 			os.Exit(1)
 		}
 		g.Add(func() error {
-			logger.Log("transport", "gRPC", "port", port)
+			logger.Log("transport", "gRPC", "addr", port)
 			baseServer := grpc.NewServer()
 			pb.RegisterCompanySvcServer(baseServer, grpcServer)
 			reflection.Register(baseServer)
