@@ -8,6 +8,8 @@ import (
 	grpctransport "github.com/go-kit/kit/transport/grpc"
 	types "github.com/gogo/protobuf/types"
 	oldcontext "golang.org/x/net/context"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	pb "github.com/nathanows/elegant-monolith/_protos/companyusers"
 )
@@ -36,7 +38,8 @@ func NewGRPCServer(endpoints Set, logger log.Logger) pb.CompanySvcServer {
 func (s *grpcServer) Save(ctx oldcontext.Context, req *pb.SaveCompanyRequest) (*pb.Company, error) {
 	_, rep, err := s.save.ServeGRPC(ctx, req)
 	if err != nil {
-		return nil, err
+		encodedErr := encodeError(err)
+		return nil, encodedErr
 	}
 	return rep.(*pb.Company), nil
 }
@@ -63,6 +66,18 @@ func (s *grpcServer) FindAll(ctx oldcontext.Context, req *pb.FindAllCompaniesReq
 		return nil, err
 	}
 	return rep.(*pb.FindAllCompaniesResponse), nil
+}
+
+func encodeError(err error) error {
+	switch err {
+	case ErrRepository:
+		return status.Error(codes.Internal, err.Error())
+	case ErrRequireName, ErrInvalidName, ErrCompanyNotFound:
+		return status.Error(codes.FailedPrecondition, err.Error())
+	default:
+		return status.Error(codes.Internal, err.Error())
+	}
+
 }
 
 func newGPRCServer(endpoint endpoint.Endpoint, options ...grpctransport.ServerOption) *grpctransport.Server {

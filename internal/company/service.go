@@ -43,14 +43,30 @@ type basicService struct {
 func (s basicService) Save(ctx context.Context, companyToSave *pb.Company) (*pb.Company, error) {
 	companyDTO := toDTO(companyToSave)
 
-	ok, err := validate(companyDTO)
-	if !ok {
+	if ok, err := validate(companyDTO); !ok {
+		errs := err.(govalidator.Errors)
+		firstErr := errs.Errors()[0].(govalidator.Error)
+		if firstErr.Name == "Name" {
+			if firstErr.Validator == "required" {
+				return nil, ErrRequireName
+			}
+			return nil, ErrInvalidName
+		}
+		// TODO: need a way to monitor for unhandled errors
 		return nil, err
 	}
 
 	saved, err := s.repository.save(companyDTO)
 	if err != nil {
-		return nil, err
+		switch {
+		case err == ErrRepo:
+			return nil, ErrRepository
+		case err == ErrNotFound:
+			return nil, ErrCompanyNotFound
+		default:
+			// TODO: need a way to monitor for unhandled errors
+			return nil, err
+		}
 	}
 
 	return saved.toProto(), nil

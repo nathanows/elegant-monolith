@@ -2,7 +2,6 @@ package company
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/go-kit/kit/log"
 	pb "github.com/nathanows/elegant-monolith/_protos/companyusers"
@@ -28,7 +27,7 @@ func (mw serviceLoggingMiddleware) Save(ctx context.Context, company *pb.Company
 		if err == nil {
 			mw.logger.Log("method", "Save", "id", returned.ID)
 		} else {
-			fmt.Println(err)
+			mw.logger.Log("method", "Save", "err", err.Error())
 		}
 	}()
 	return mw.next.Save(ctx, company)

@@ -1,7 +1,15 @@
 package company
 
 import (
+	"errors"
+
 	"github.com/jmoiron/sqlx"
+)
+
+// Common errors
+var (
+	ErrRepo     = errors.New("unable to handle request")
+	ErrNotFound = errors.New("company not found")
 )
 
 // Repository is the datastore inteface for the company service
@@ -30,16 +38,25 @@ func (r repository) save(company *companyDTO) (*companyDTO, error) {
 		if company.ID == 0 {
 			stmt, err = r.db.PrepareNamed(sqlInsertCompany)
 		} else {
+			var companyExists bool
+			if err := r.db.Get(&companyExists, sqlCompanyExists, company.ID); err != nil {
+				return nil, ErrRepo
+			}
+
+			if !companyExists {
+				return nil, ErrNotFound
+			}
+
 			stmt, err = r.db.PrepareNamed(sqlUpdateCompany)
 		}
 		if err != nil {
-			return nil, err
+			return nil, ErrRepo
 		}
 	}
 
 	var saved companyDTO
 	if err := stmt.QueryRowx(company).StructScan(&saved); err != nil {
-		return nil, err
+		return nil, ErrRepo
 	}
 
 	return &saved, nil
@@ -56,6 +73,8 @@ func (r repository) find(id int64) (*companyDTO, error) {
 func (r repository) findAll() ([]*companyDTO, error) {
 	return []*companyDTO{}, nil
 }
+
+const sqlCompanyExists = "select exists(select 1 from companies where id=?)"
 
 const sqlInsertCompany = `
 	INSERT INTO companies (name)
