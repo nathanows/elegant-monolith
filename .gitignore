@@ -1,1 +1,5 @@
+# Local Application Config Settings 
 config.json
+
+# Local Build Artifacts
+elegant-monolith

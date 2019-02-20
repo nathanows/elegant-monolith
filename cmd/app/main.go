@@ -61,8 +61,7 @@ func run(cmd *cobra.Command, args []string) {
 
 	var db *sqlx.DB
 	{
-		var err error
-		db, err = sqlx.Connect("postgres", config.DatabaseConfig.BuildDbConnectionStr())
+		db, err := sqlx.Connect("postgres", config.DatabaseConfig.BuildDbConnectionStr())
 		if err != nil {
 			logger.Log("database", config.DatabaseConfig.Database, "during", "connect", "err", err)
 			os.Exit(1)
